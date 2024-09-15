@@ -1,17 +1,24 @@
 import streamlit as st
 from nudenet import NudeDetector
 from PIL import Image
+import numpy as np
+import io
 
 # Initialize the detector
 detector = NudeDetector()
 
-# Serious labels for blocking nudity
-block_labels = [
+# Serious labels for blocking nudity (with a threshold of 30%)
+block_labels_30 = [
     "BUTTOCKS_EXPOSED",
     "FEMALE_BREAST_EXPOSED",
     "FEMALE_GENITALIA_EXPOSED",
     "ANUS_EXPOSED",
     "MALE_GENITALIA_EXPOSED"
+]
+
+# Labels with a higher threshold of 50%
+block_labels_50 = [
+    "BELLY_EXPOSED"
 ]
 
 # Streamlit interface
@@ -30,12 +37,11 @@ if uploaded_image is not None:
         if st.button("Check for Nudity"):
             st.write("Checking for nudity...")
 
-            # Save the uploaded image temporarily
-            with open("temp_image.jpg", "wb") as f:
-                f.write(uploaded_image.getbuffer())
-            
+            # Convert the image to a numpy array
+            image_array = np.array(image)
+
             # Detect nudity
-            results = detector.detect('temp_image.jpg')
+            results = detector.detect(image_array)
 
             # Flag to block the image
             block_image = False
@@ -43,15 +49,15 @@ if uploaded_image is not None:
             # Check detection results
             for result in results:
                 detected_class = result['class']  # Accessing the class key
-                score = result['score'] * 100  # Assuming the score is from 0 to 1, converting to percentage
+                score = result['score'] * 100  # Convert score to percentage
 
-                # Block if serious class and score > 30%
-                if detected_class in block_labels and score > 25:
+                # Block if serious nudity class with threshold of 30%
+                if detected_class in block_labels_30 and score > 30:
                     block_image = True
-                    st.error(f"Image blocked due to serious nudity: {detected_class} with score {score}%")
+                    st.error(f"Image blocked due to detected nudity: {detected_class} with score {score}%")
                     break
-            
 
+                # Add the belly-specific block with a higher threshold of 50%
                 if detected_class == "BELLY_EXPOSED" and score > 50:
                     block_image = True
                     st.error(f"Image blocked due to detected nudity: {detected_class} with score {score}%")
