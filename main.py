@@ -11,8 +11,7 @@ block_labels = [
     "FEMALE_BREAST_EXPOSED",
     "FEMALE_GENITALIA_EXPOSED",
     "ANUS_EXPOSED",
-    "MALE_GENITALIA_EXPOSED",
-    "BELLY_EXPOSED"
+    "MALE_GENITALIA_EXPOSED"
 ]
 
 # Streamlit interface
@@ -48,6 +47,12 @@ if uploaded_image is not None:
 
                 # Block if serious class and score > 30%
                 if detected_class in block_labels and score > 25:
+                    block_image = True
+                    st.error(f"Image blocked due to serious nudity: {detected_class} with score {score}%")
+                    break
+            
+
+                if detected_class == "BELLY_EXPOSED" and score > 50:
                     block_image = True
                     st.error(f"Image blocked due to detected nudity: {detected_class} with score {score}%")
                     break
