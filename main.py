@@ -58,7 +58,7 @@ if uploaded_image is not None:
                     break
 
                 # Add the belly-specific block with a higher threshold of 50%
-                if detected_class == "BELLY_EXPOSED" and score > 50:
+                if detected_class in block_labels_50 and score > 50:
                     block_image = True
                     st.error(f"Image blocked due to detected nudity: {detected_class} with score {score}%")
                     break
