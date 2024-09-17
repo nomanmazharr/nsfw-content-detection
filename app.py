@@ -2,7 +2,6 @@ import streamlit as st
 from nudenet import NudeDetector
 from PIL import Image
 import numpy as np
-import io
 
 # Initialize the detector
 detector = NudeDetector()
@@ -63,7 +62,7 @@ if uploaded_image is not None:
                     break
 
                 # Add the belly-specific block with a higher threshold of 50%
-                if detected_class in block_labels_50 and score > 50:
+                if detected_class in block_labels_50 and score < 80:
                     block_image = True
                     st.error(f"Image blocked due to detected nudity: {detected_class} with score {score}%")
                     break
