@@ -2,23 +2,27 @@ import streamlit as st
 from nudenet import NudeDetector
 from PIL import Image
 import numpy as np
-import io
 
 # Initialize the detector
 detector = NudeDetector()
 
 # Serious labels for blocking nudity (with a threshold of 30%)
-block_labels_30 = [
+block_labels_10 = [
     "BUTTOCKS_EXPOSED",
     "FEMALE_BREAST_EXPOSED",
     "FEMALE_GENITALIA_EXPOSED",
     "ANUS_EXPOSED",
-    "MALE_GENITALIA_EXPOSED"
+    "MALE_GENITALIA_EXPOSED",
+    "BELLY_EXPOSED"
 ]
 
 # Labels with a higher threshold of 50%
-block_labels_50 = [
-    "BELLY_EXPOSED"
+block_labels_80 = [
+    "BUTTOCKS_COVERED",
+    "FEMALE_BREAST_COVERED",
+    "FEMALE_GENITALIA_COVERED",
+    "ANUS_COVERED",
+    "MALE_GENITALIA_COVERED"
 ]
 
 # Streamlit interface
@@ -52,13 +56,13 @@ if uploaded_image is not None:
                 score = result['score'] * 100  # Convert score to percentage
 
                 # Block if serious nudity class with threshold of 30%
-                if detected_class in block_labels_30 and score > 30:
+                if detected_class in block_labels_10 and score > 10:
                     block_image = True
                     st.error(f"Image blocked due to detected nudity: {detected_class} with score {score}%")
                     break
 
                 # Add the belly-specific block with a higher threshold of 50%
-                if detected_class in block_labels_50 and score > 50:
+                if detected_class in block_labels_80 and score < 80:
                     block_image = True
                     st.error(f"Image blocked due to detected nudity: {detected_class} with score {score}%")
                     break
